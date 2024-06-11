@@ -3,5 +3,4 @@
 
     <!--Prototype-->
     <Script file = "Prototype.lua"/>
-    <Script file = "Test.lua"/>
 </Ui>
