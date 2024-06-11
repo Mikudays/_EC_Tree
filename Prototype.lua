@@ -530,7 +530,7 @@ do
                 ns                      = getValidatedNS(ns)
                 if ns then
                     for i, g_ns in ipairs, _GlobalNS, 0 do
-                        if g_ns == ns then tremove(__GlobalNS, i) return end
+                        if g_ns == ns then tremove(_GlobalNS, i) return end
                     end
                 end
             end;
