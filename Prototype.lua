@@ -871,22 +871,6 @@ do
                 return ns
             end;
 
-            --- Set the parent environment to the environment
-            ---
-            --- @param  env
-            --- @param  parent
-            ["SetParent"]                = function(env, parent)
-                rawset(env, _ENV_NS_PARENT, parent)
-            end;
-
-            --- Get the parent environment from the environment
-            ---
-            --- @param  env
-            --- @return parent
-            ["GetParent"]                = function(env)
-                return type(env) == "table" and rawget(env, _ENV_NS_PARENT) or nil
-            end;
-
             --- Set the namespace owner from the environment
             ---
             --- @param  env
@@ -901,6 +885,22 @@ do
             --- @return owner
             ["GetOwner"]                = function(env)
                 return rawget(env, _ENV_NS_OWNER)
+            end;
+
+            --- Set the parent environment to the environment
+            ---
+            --- @param  env
+            --- @param  parent
+            ["SetParent"]                = function(env, parent)
+                rawset(env, _ENV_NS_PARENT, parent)
+            end;
+
+            --- Get the parent environment from the environment
+            ---
+            --- @param  env
+            --- @return parent
+            ["GetParent"]                = function(env)
+                return type(env) == "table" and rawget(env, _ENV_NS_PARENT) or nil
             end;
 
             --- Turn on/off the definition mode for an environment, the value won't be auto-cached to the environment in definition mode
