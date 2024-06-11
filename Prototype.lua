@@ -1093,7 +1093,7 @@ do
     if not rawget(_G, "import")    then rawset(_G, "import",    import)    end
     if not rawget(_G, "export")    then rawset(_G, "export",    export)    end
 
-    _G.Hash                             = ROOT_NAMESPACE
+    _G._EC_Tree                         = ROOT_NAMESPACE
 end
 
 return ROOT_NAMESPACE
