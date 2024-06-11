@@ -1,0 +1,10 @@
+﻿## Interface: 90200
+## Title: [Lib] _EC_Tree
+## Author: mikuday0312@gmail.com
+## Version: v037
+## Notes: Prototype Lua environment-control tree system
+## URL: http://github.com/Mikudays/_EC_Tree
+## DefaultState: Enabled
+## LoadOnDemand: 0
+
+_EC_Tree.xml

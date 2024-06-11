@@ -1,0 +1,7 @@
+<Ui>
+    <Script file = "Platform.lua"/>
+
+    <!--Prototype-->
+    <Script file = "Prototype.lua"/>
+    <Script file = "Test.lua"/>
+</Ui>
