@@ -47,7 +47,6 @@ do
             --- Math
             ceil                        = math.ceil,
             floor                       = math.floor,
-            random                      = math.random,
 
             --- Type
             type                        = type,
