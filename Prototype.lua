@@ -191,11 +191,11 @@ do
     })
 
     ----------------------------------------------------------------
-    --- Deep copy the source to target table
+    --- Deep clone the source to target table
     ---
     --- @return table
     ----------------------------------------------------------------
-    TDeepCopy                           = function(src, tar, override, cache)
+    TDeepClone                          = function(src, tar, override, cache)
         if cache then cache[src]        = tar end
 
         for k, v in pairs, src do
@@ -203,26 +203,26 @@ do
                 if cache and cache[v] then
                     tar[k]              = cache[v]
                 elseif type(v) == "table" and getmetatable(v) == nil then
-                    tar[k]              = TDeepCopy(v, {}, override, cache)
+                    tar[k]              = TDeepClone(v, {}, override, cache)
                 else
                     tar[k]              = v
                 end
             elseif type(v) == "table" and type(tar[k]) == "table" and getmetatable(v) == nil and getmetatable(tar[k]) == nil then
-                TDeepCopy(v, tar[k], nil, cache)
+                TDeepClone(v, tar[k], nil, cache)
             end
         end
         return tar
     end
 
     ----------------------------------------------------------------
-    --- Copy the source to target table
+    --- Clone the source to target table
     ---
     --- @return table
     ----------------------------------------------------------------
-    TCopy                               = function(src, tar, deep, override, safe)
+    TClone                              = function(src, tar, deep, override, safe)
         if deep then
             safe                        = safe and TCache()
-            TDeepCopy(src, tar, override, safe) -- if safe true, cache for duplicated table
+            TDeepClone(src, tar, override, safe) -- if safe true, cache for duplicated table
             if safe then TCache(safe) end
         else
             for k, v in pairs, src do
@@ -236,8 +236,8 @@ do
     --- Loading a chunk string and return it as a function
     ---
     --- @param  chunk:string
-    --- @param  err:string              default anonymous
-    --- @param  env:table               default _G
+    --- @param  err:string
+    --- @param  env                     default _G
     --- @return function
     ----------------------------------------------------------------
     LoadChunk                           = (function()
@@ -294,11 +294,12 @@ do
     end)()
 
     ----------------------------------------------------------------
-    --- Register target to prototype
+    --- The prototype provided a system to build prototypes of others,
+    --- the environment prototype used to generate environments used as type builders or modules
     ---
-    --- @param  super:userdata/table
-    --- @param  meta:table
-    --- @param  nodeepcopy:bool
+    --- @param  super
+    --- @param  meta
+    --- @param  nodeepclone:bool
     --- @return prototype
     ----------------------------------------------------------------
     prototype                           = (function()
@@ -317,8 +318,8 @@ do
 
         --- Generate handler
         tinsert(body, [[
-            local function Register(...)
-                local super, meta, nodeepcopy
+            local function _To(...)
+                local super, meta, nodeepclone
         ]])
 
         --- Parse param
@@ -340,7 +341,7 @@ do
                 elseif vt == "userdata" and _PrototypeMap[v] then
                     super               = v
                 elseif vt == "boolean" then
-                    nodeepcopy          = v
+                    nodeepclone         = v
                 end
             end
 
@@ -350,10 +351,10 @@ do
             _PrototypeMap[prototype]    = pmeta
         ]])
 
-        --- Copy meta-table
-        tinsert(apis, "TCopy")
+        --- Clone meta-table
+        tinsert(apis, "TClone")
         tinsert(body, [[
-            if meta then TCopy(meta, pmeta, not nodeepcopy, true, true) end
+            if meta then TClone(meta, pmeta, not nodeepclone, true, true) end
         ]])
 
         --- Default
@@ -364,7 +365,7 @@ do
 
         --- Inherit
         tinsert(body, [[
-            if super then TCopy(_PrototypeMap[super], pmeta, true, false, true) end
+            if super then TClone(_PrototypeMap[super], pmeta, true, false, true) end
         ]])
 
         --- Log
@@ -380,8 +381,7 @@ do
                 return prototype
             end
 
-            return Register
-            {
+            return _To {
                 __tostring              = "prototype",
                 __index                 = {
                     ["NewProxy"]        = newproxy;
@@ -389,7 +389,7 @@ do
                     ["Validate"]        = function(self) return _PrototypeMap[self] and self end;
                 },
                 __newindex              = readonly,
-                __call                  = function(self, ...) return Register(...) end,
+                __call                  = function(self, ...) return _To(...) end,
             }
         ]])
 
@@ -746,7 +746,7 @@ do
 
                 --- Generate meta-method __index handler
                 tinsert(body, [[
-                    local function _Sequencer(env, key)
+                    local function _To(env, key)
                         local value
                 ]])
 
@@ -786,7 +786,7 @@ do
                         if key == getNSPath(outer, true) then return outer end
                         value           = rawget(outer, key)
                         if value == nil then
-                            value       = _Sequencer(outer, key)
+                            value       = _To(outer, key)
                         end
                     end
                 ]])
@@ -807,7 +807,7 @@ do
 
                 --- Check root namespace & global namespaces & _G
                 tinsert(body, [[
-                    value               = _Sequencer(env, key) or getNamespace(env, key) or getNamespace(key)
+                    value               = _To(env, key) or getNamespace(env, key) or getNamespace(key)
                     if value == nil then
                         for _, ns in ipairs, _GlobalNS, 0 do
                             value       = ns[key]
@@ -1063,8 +1063,8 @@ do
             --- Cache
             TCache                      = TCache,
 
-            --- Copy
-            TCopy                       = TCopy,
+            --- Clone
+            TClone                      = TClone,
 
             --- Load string
             LoadChunk                   = LoadChunk,
